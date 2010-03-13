@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+sub ip { join ".", unpack "C*", pack "H*", $_[0] }
+
+sub many_ips { join " ", map { ip($_) } split ' ', $_[0] }
+
+$| = 1;
+while (<>) {
+	print $1 if s/^(@\w+ )//;
+
+	s/^(query \S+ )(\w+)(?=:)/$1.ip($2)/e;
+	s/^(tcp(?:open|close) )(\w+)(?=:)/$1.ip($2)/e;
+	s/^(tx \S+ \S+ \S+ \S+ )(.*)/$1.many_ips($2)/e;
+	s/^((?:nxdomain|nodata|lame) )(\w+)(?= )/$1.ip($2)/e;
+	s/^(rr )(\w+)(?= )/$1.ip($2)/e;
+
+	print;
+}
+
+=pod
+
+Found by reading log.c:
+
+  starting
+  query $qnum $clientip:$clientport:$id $qtype $qname
+  sent $qnum $len
+  drop $qnum $error-string
+  tcpopen $clientip:$clientport
+  tcpclose $clientip:$clientport $error-string
+  tx $gluelessness $qtype $qname $controlname $serverip [$serverip ...]
+  cached $qtype $qname
+  cached cname $cname $dname
+  cached ns $controlname $nsname
+  cached nxdomain $qname
+  nxdomain $serverip $ttl $qname
+  nodata $serverip $ttl $qtype $qname
+  lame $serverip $controlname $referralname
+  servfail $qname $error-string
+  rr $serverip $ttl $qtype $qname $hexdata
+  rr $serverip $ttl ns $qname $nsname
+  rr $serverip $ttl cname $qname $dname
+  rr $serverip $ttl ptr $qname $ptrdname
+  rr $serverip $ttl mx $qname $pref $mxname
+  rr $serverip $ttl soa $qname $n1name $n2name $num [x 20]
+  stats $numqueries $cache_motion $uactive $tactive
+
+# eof read-djbdns-ips

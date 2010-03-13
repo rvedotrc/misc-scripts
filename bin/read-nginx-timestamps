@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+my $i = '';
+my $o;
+
+$| = 1, shift() if @ARGV and $ARGV[0] eq "-f";
+
+while (<>) { s/^(\d+)/t($1)/e; print; }
+
+sub t {
+	return $o if $_[0] eq $i;
+	$i = $_[0];
+	my @t = gmtime $i;
+	return $o = sprintf "%04d-%02d-%02dT%02d:%02d:%02dZ",
+		$t[5]+1900,
+		$t[4]+1,
+		@t[3,2,1,0];
+}

@@ -1,0 +1,154 @@
+#!/usr/bin/perl
+
+# exec "sudo", "-u", "exim", $0, @ARGV unless getpwnam($<) eq "exim";
+# pass_persist .1.3.6.1.4.1.1532281856.1 /usr/local/bin/linux26-diskstats-agent
+
+use warnings;
+use strict;
+
+if ("@ARGV" eq "dump")
+{
+	my @r;
+	sub M::set_responses { shift; @r = @_; }
+	prepare_responses("M");
+	while (@r)
+	{
+		my ($oid, $type, $value) = splice(@r, 0, 3);
+		printf "$oid\t$type\t$value\n";
+	}
+	exit;
+}
+
+require SNMPAgentUtil;
+
+SNMPAgentUtil->run(
+	# log_to => "/dev/tty",
+	# log_to => "/tmp/exim_snmp_agent.log",
+	# get => \&get,
+	# get_next => \&get_next,
+	prepare_responses => \&prepare_responses,
+);
+
+{
+    my $expire = time;
+
+    sub prepare_responses
+    {
+        my ($self) = @_;
+
+        return if defined($expire) and time() < $expire;
+
+        my @responses;
+
+=pod
+
+Example /proc/diskstats:
+
+   1    0 ram0 0 0 0 0 0 0 0 0 0 0 0
+   1    1 ram1 0 0 0 0 0 0 0 0 0 0 0
+   1    2 ram2 0 0 0 0 0 0 0 0 0 0 0
+   1    3 ram3 0 0 0 0 0 0 0 0 0 0 0
+   1    4 ram4 0 0 0 0 0 0 0 0 0 0 0
+   1    5 ram5 0 0 0 0 0 0 0 0 0 0 0
+   1    6 ram6 0 0 0 0 0 0 0 0 0 0 0
+   1    7 ram7 0 0 0 0 0 0 0 0 0 0 0
+   1    8 ram8 0 0 0 0 0 0 0 0 0 0 0
+   1    9 ram9 0 0 0 0 0 0 0 0 0 0 0
+   1   10 ram10 0 0 0 0 0 0 0 0 0 0 0
+   1   11 ram11 0 0 0 0 0 0 0 0 0 0 0
+   1   12 ram12 0 0 0 0 0 0 0 0 0 0 0
+   1   13 ram13 0 0 0 0 0 0 0 0 0 0 0
+   1   14 ram14 0 0 0 0 0 0 0 0 0 0 0
+   1   15 ram15 0 0 0 0 0 0 0 0 0 0 0
+   2    0 fd0 0 0 0 0 0 0 0 0 0 0 0
+  11    0 sr0 0 0 0 0 0 0 0 0 0 0 0
+   8    0 sda 9894757 6522740 169121705 92454320 7612017 20422801 224352464 583619050 0 49375100 676063930
+   8    1 sda1 7516710 97915568 21175321 169402568
+   8    2 sda2 8900795 71205041 6868521 54947976
+
+=cut
+
+	# .1.3.6.1.4.1.1532281856 = fake djce enterprise
+	#	.1 = linux 2.6 disk stats
+	#	  .1 = "disk" devices
+	#	    .maj.min.X
+	#	            .1 = major
+	#	            .2 = minor
+	#	            .3 = name
+	#	            .4 = read_ops
+	#	            .5 = read_merge_ops
+	#	            .6 = read_sectors
+	#	            .7 = read_ms
+	#	            .8 = write_ops
+	#	            .9 = write_merge_ops
+	#	            .10 = write_sectors
+	#	            .11 = write_ms
+	#	            .12 = ops_in_progress
+	#	            .13 = ops_ms
+	#	            .14 = ops_weighted_ms
+	#	  .2 = "partition" devices
+	#	    .maj.min.X
+	#	            .1 = major
+	#	            .2 = minor
+	#	            .3 = name
+	#	            .4 = read_ops
+	#	            .5 = read_sectors
+	#	            .6 = write_ops
+	#	            .7 = write_sectors
+
+	my @disks = ();
+	my @parts = ();
+
+	{
+		open(my $fh, "<", "/proc/diskstats") or last;
+		while (<$fh>)
+		{
+			my ($maj, $min, $name, @s) = m/(\S+)/g;
+
+			if (@s==11)
+			{
+				my $base = ".1.3.6.1.4.1.1532281856.1.1.$maj.$min";
+				push @disks, "$base.1", "integer", $maj;
+				push @disks, "$base.2", "integer", $min;
+				push @disks, "$base.3", "string", $name;
+				push @disks, "$base.4", "counter", $s[0];
+				push @disks, "$base.5", "counter", $s[1];
+				push @disks, "$base.6", "counter", $s[2];
+				push @disks, "$base.7", "counter", $s[3];
+				push @disks, "$base.8", "counter", $s[4];
+				push @disks, "$base.9", "counter", $s[5];
+				push @disks, "$base.10", "counter", $s[6];
+				push @disks, "$base.11", "counter", $s[7];
+				push @disks, "$base.12", "gauge", $s[8];
+				push @disks, "$base.13", "counter", $s[9];
+				push @disks, "$base.14", "counter", $s[10];
+			}
+			elsif (@s==4)
+			{
+				my $base = ".1.3.6.1.4.1.1532281856.1.2.$maj.$min";
+				push @parts, "$base.1", "integer", $maj;
+				push @parts, "$base.2", "integer", $min;
+				push @parts, "$base.3", "string", $name;
+				push @parts, "$base.4", "counter", $s[0];
+				push @parts, "$base.5", "counter", $s[1];
+				push @parts, "$base.6", "counter", $s[2];
+				push @parts, "$base.7", "counter", $s[3];
+			}
+		}
+
+		close $fh;
+	}
+
+	push @responses, ".1.3.6.1.4.1.1532281856.1", "string", "dummy";
+	push @responses, ".1.3.6.1.4.1.1532281856.1.1", "string", "dummy";
+	push @responses, @disks;
+	push @responses, ".1.3.6.1.4.1.1532281856.1.2", "string", "dummy";
+	push @responses, @parts;
+
+        $self->set_responses(@responses);
+
+        $expire = time() + 10;
+    }
+}
+
+# eof
