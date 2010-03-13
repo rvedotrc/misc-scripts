@@ -8,15 +8,37 @@ sub ip { join ".", unpack "C*", pack "H*", $_[0] }
 
 sub many_ips { join " ", map { ip($_) } split ' ', $_[0] }
 
+my %qtypes = qw(
+	1	a
+	28	aaaa
+	5	cname
+	2	ns
+	12	ptr
+	6	soa
+	33	srv
+	16	txt
+);
+
+sub qtype { $qtypes{$_[0]} || $_[0] }
+
 $| = 1;
 while (<>) {
 	print $1 if s/^(@\w+ )//;
 
+	# IPs
 	s/^(query \S+ )(\w+)(?=:)/$1.ip($2)/e;
 	s/^(tcp(?:open|close) )(\w+)(?=:)/$1.ip($2)/e;
 	s/^(tx \S+ \S+ \S+ \S+ )(.*)/$1.many_ips($2)/e;
 	s/^((?:nxdomain|nodata|lame) )(\w+)(?= )/$1.ip($2)/e;
 	s/^(rr )(\w+)(?= )/$1.ip($2)/e;
+	s/^(rr \S+ \S+ 1 \S+ )(\w+)$/$1.ip($2)/e;
+
+	# QTypes
+	s/^(query \S+ \S+ )(\d+)(?= )/$1.qtype($2)/e;
+	s/^(tx \S+ )(\d+)(?= )/$1.qtype($2)/e;
+	s/^(cached )(\d+)(?= )/$1.qtype($2)/e;
+	s/^(nodata \S+ \S+ )(\d+)(?= )/$1.qtype($2)/e;
+	s/^(rr \S+ \S+ )(\d+)(?= )/$1.qtype($2)/e;
 
 	print;
 }
