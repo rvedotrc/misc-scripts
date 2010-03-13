@@ -12,6 +12,7 @@ my %qtypes = qw(
 	1	a
 	28	aaaa
 	5	cname
+	15	mx
 	2	ns
 	12	ptr
 	6	soa
@@ -40,12 +41,15 @@ while (<>) {
 	s/^(nodata \S+ \S+ )(\d+)(?= )/$1.qtype($2)/e;
 	s/^(rr \S+ \S+ )(\d+)(?= )/$1.qtype($2)/e;
 
+	# tinydns / axfrdns
+	s/^([0-9a-f]{8})(:[0-9a-f]{4}:[0-9a-f]{4} (?:\S )?)([0-9a-f]{4})(?= )/ip($1).$2.qtype(hex $3)/e;
+
 	print;
 }
 
 =pod
 
-Found by reading log.c:
+dnscache log lines, from reading log.c:
 
   starting
   query $qnum $clientip:$clientport:$id $qtype $qname
@@ -69,5 +73,17 @@ Found by reading log.c:
   rr $serverip $ttl mx $qname $pref $mxname
   rr $serverip $ttl soa $qname $n1name $n2name $num [x 20]
   stats $numqueries $cache_motion $uactive $tactive
+
+tinydns log lines:
+
+  starting tinydns
+  $clientip:$clientport:$id $resp $qtype $qname
+    where $resp is:
+	"-" - did not respond
+	"+" - responded
+	"I" - not implemented
+	"C" - weird class
+	"/" - no query
+    axfrdns omits the $resp field.
 
 # eof read-djbdns-ips
