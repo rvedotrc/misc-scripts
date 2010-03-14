@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if [ $# != 3 -a $# != 4 ] ; then
+	echo "Usage: new-repo ./somedir user@gitserver /home/user/var/git [whatever.git]" >&2
+	exit 2
+fi
+
+DIR="$1"
+shift
+USER_AT_SERVER="$1"
+shift
+ABS_PATH="$1"
+shift
+DOTGITNAME=${1:-$( basename "$DIR" ).git}
+shift
+
+set -e -x
+
+pushd "$DIR"
+
+# Check there's a commit
+git-rev-parse HEAD
+
+# Check there's not already an origin
+if git config --get remote.origin.url ; then exit 1 ; fi
+if git config --get branch.master.remote ; then exit 1 ; fi
+if git config --get branch.master.merge ; then exit 1 ; fi
+
+popd
+
+TMPPATH="$( mktemp -d -t new-repo-XXXXXXXX )"
+trap 'rm -rf "$TMPPATH"' 0
+git clone --bare "$DIR" "$TMPPATH"/"$DOTGITNAME"
+rsync -av --delete "$TMPPATH"/"$DOTGITNAME"/ "$USER_AT_SERVER:$ABS_PATH/$DOTGITNAME"/
+
+pushd "$DIR"
+git remote add origin "ssh://$USER_AT_SERVER$ABS_PATH/$DOTGITNAME"
+git config branch.master.remote origin
+git config branch.master.merge refs/heads/master
+popd
+
+echo "Copied $DIR to $USER_AT_SERVER:$ABS_PATH/$DOTGITNAME"
+
+# eof
