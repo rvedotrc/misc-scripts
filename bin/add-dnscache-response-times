@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+my %q;
+use Math::BigInt;
+
+$| = 1;
+
+while (<>) {
+	my ($ts) = /^@(\w+) / or next;
+	$ts = Math::BigInt->new("0x$ts");
+
+	if (/^@\w+ query (\d+) (.*)/) {
+		$q{$1} = { ts => $ts, line => $2 };
+	}
+
+	if (/^@\w+ sent (\d+) /) {
+		if (my $q = delete $q{$1}) {
+			my $elapsed = $ts - $q->{ts};
+			$elapsed *= 1E6;
+			$elapsed /= (1<<16);
+			$elapsed /= (1<<16);
+			s/$/ ${elapsed}us/;
+			s/$/ $q->{line}/;
+		}
+	}
+
+	if (/^@\w+ starting$/) {
+		%q = ();
+	}
+} continue {
+	print;
+}
