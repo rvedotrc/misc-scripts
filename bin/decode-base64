@@ -1,3 +1,3 @@
 #!/bin/sh
 #exec perl -MMIME::Base64=decode_base64 -we'local $/; print decode_base64(<>)'
-exec openssl enc -d base64
+exec openssl enc -d -base64
