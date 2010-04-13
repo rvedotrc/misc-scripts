@@ -1,0 +1,2 @@
+#!/bin/sh
+exec perl -MURI::Escape=uri_unescape -pe '$_=uri_unescape($_)'

@@ -1,0 +1,2 @@
+#!/bin/sh
+exec perl -MEncode=encode -pe '$_ = encode("MIME-Header",$_)'

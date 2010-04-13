@@ -1,0 +1,15 @@
+#!/usr/bin/perl -p
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+our %map;
+BEGIN { %map = (
+	'>'	=> '&gt;',
+	'<'	=> '&lt;',
+	'"'	=> '&quot;',
+	'&'	=> '&amp;',
+) }
+
+s/([<>"&])/$map{$1}/g;

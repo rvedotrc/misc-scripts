@@ -1,0 +1,10 @@
+#!/usr/bin/perl -p
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+s/&lt;/</g;
+s/&gt;/>/g;
+s/&quot;/"/g;
+s/&amp;/&/g;

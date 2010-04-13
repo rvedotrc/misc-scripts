@@ -1,0 +1,2 @@
+#!/bin/sh
+exec perl -MMIME::QuotedPrint=encode_qp -we'local $/; print encode_qp(<>)'
