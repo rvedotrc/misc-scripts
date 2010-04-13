@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+# vi: set ts=4 sw=4 :
+
+use strict;
+
+=pod
+
+=head1 NAME
+
+uniqish - output only unique lines, more or less
+
+=head1 SYNOPSIS
+
+    uniqish [--lines|-n COUNT] [FILE ...]
+
+=head1 DESCRIPTION
+
+C<uniqish> reads lines from the specified FILEs (or standard input, if no
+files are named).  Each line is copied to standard output, unless the last
+COUNT lines were all exactly the same as this one.  The default value for
+COUNT is 5.
+
+=cut
+
+my $n = 5;
+use Getopt::Long;
+GetOptions(
+	"lines|n=i"	=> \$n,
+) or exit 2;
+
+my $last = '';
+my $count = 0;
+
+while (<>)
+{
+	if ($_ eq $last)
+	{
+		if (++$count <= $n)
+		{
+			print or die $!;
+		}
+	} else {
+		print or die $!;
+		$last = $_;
+		$count = 1;
+	}
+}
+
+close STDOUT or die $!;
+
+# eof uniq-limit

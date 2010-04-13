@@ -1,0 +1,12 @@
+#!/bin/bash
+
+GLOB="$1"
+
+IFS=:
+for p in $PATH
+do
+	shopt -s nullglob dotglob
+	eval "ls -ald /does/not/exist $p/$GLOB" 2>/dev/null
+done
+
+# eof

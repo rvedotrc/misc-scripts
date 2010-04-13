@@ -1,0 +1,3 @@
+#!/usr/bin/perl
+binmode STDOUT;
+print chr($_) for 0..255;
