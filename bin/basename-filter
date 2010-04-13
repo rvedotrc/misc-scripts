@@ -1,0 +1,5 @@
+#!/usr/bin/perl -lp
+# vi: set ts=4 sw=4 :
+
+use File::Basename qw( basename );
+$_ = basename($_);

@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+use Cwd 'realpath';
+
+my $errors;
+
+if (@ARGV) {
+	do_it(shift);
+} else {
+	while (<>) {
+		chomp;
+		do_it($_);
+	}
+}
+
+exit($errors ? 1 : 0);
+
+sub do_it {
+	my $in = shift;
+	if (defined(my $path = realpath($in))) {
+		print "$path\n";
+	} else {
+		print STDERR "realpath '$in': $!\n";
+		++$errors;
+	}
+}
+
+# eof realpath

@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+my %n;
+my $lines = 0;
+while (<>)
+{
+	++$n{$_};
+	++$lines;
+}
+
+while (my ($line, $count) = each %n)
+{
+	printf " %6.2f%%  %10s %s",
+		100*$count/$lines, $count, $line;
+}
+
+# eof countpct

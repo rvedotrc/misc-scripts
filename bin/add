@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+use Math::BigFloat;
+my $t = Math::BigFloat->new(0);
+my $n = 0;
+
+my $average;
+$average = 1, shift if @ARGV and $ARGV[0] eq "-a";
+
+if (@ARGV and $ARGV[0] eq "-e") {
+	shift;
+	add($_) for @ARGV;
+} else {
+	while (<>) {
+		chomp;
+		add($_);
+	}
+}
+
+print $t;
+if ($average and $n) {
+	print "\t";
+	printf "%.2f", $t/$n;
+}
+print "\n";
+
+sub add {
+	my $arg = Math::BigFloat->new(shift);
+	$t += $arg, ++$n unless $arg->is_nan;
+}
