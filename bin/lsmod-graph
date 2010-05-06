@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Example: ./lsmod-graph | dot -T png -o lsmod-graph.png
+
+echo "digraph lsmod {"
+lsmod | tail -n+2 | while read LINE ; do
+	echo "// $LINE"
+	IFS=' '
+	set -f
+	set $LINE
+	MOD=$1
+	echo "$MOD"
+	IFS=,
+	for DEP in $4 ; do
+		if echo "$DEP" | fgrep -q '[' ; then
+			continue
+		fi
+		echo "$MOD -> $DEP"
+	done
+done
+echo "}"
+
+# eof
