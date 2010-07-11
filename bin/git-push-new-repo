@@ -39,8 +39,7 @@ if git config --get branch.master.merge ; then exit 1 ; fi
 popd
 
 # Make REMOTE_PATH absolute
-# FIXME: quoting errors
-REMOTE_PATH=`ssh "$USER_AT_SERVER" "cd $REMOTE_PATH && pwd"`
+REMOTE_PATH="$( printf '%s\0' "$REMOTE_PATH" | ssh "$USER_AT_SERVER" "xargs -0 sh -c '"'set -e ; cd "$0" ; pwd'"'" )"
 
 TMPPATH="$( mktemp -d -t new-repo-XXXXXXXX )"
 trap 'rm -rf "$TMPPATH"' 0
