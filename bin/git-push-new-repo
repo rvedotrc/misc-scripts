@@ -28,6 +28,9 @@ if git config --get branch.master.merge ; then exit 1 ; fi
 
 popd
 
+# Make the remote path absolute
+ABS_PATH=$( printf '%s\0' "$ABS_PATH" | ssh "$USER_AT_SERVER" "xargs -0 sh -c '"'set -e ; cd "$0" ; pwd'"'" )
+
 TMPPATH="$( mktemp -d -t new-repo-XXXXXXXX )"
 trap 'rm -rf "$TMPPATH"' 0
 git clone --bare "$DIR" "$TMPPATH"/"$DOTGITNAME"
