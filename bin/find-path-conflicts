@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+# Scans directories on your $PATH for executables; for each executable name
+# found in more than one such directory, shows the executable name and the
+# locations in which it was found.
+
+my @dirs = split /:/, $ENV{PATH};
+my %whereis;
+
+my %done_dir;
+
+for my $dir (@dirs) {
+	next if $done_dir{$dir}++;
+	-d($dir) or warn("Warning: $dir (on your PATH) is not a directory\n"), next;
+
+	use File::Find qw( find );
+	find(
+		sub {
+			return if $_ eq ".";
+			$File::Find::prune = 1, return
+				unless -f(_) and -x(_);
+			push @{ $whereis{$_} }, $dir;
+		},
+		$dir,
+	);
+}
+
+for my $command (sort keys %whereis) {
+	my $dirs = $whereis{$command};
+	delete $whereis{$command}, next if @$dirs == 1;
+	print "$command:";
+	print " $_/$command" for @$dirs;
+	print "\n";
+}
+
+print "No conflicts found\n" if not %whereis;
+
+# eof find-path-conflicts
