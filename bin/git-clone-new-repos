@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# This script is specific to me, so maybe it doesn't belong in the
+# misc-scripts repository.
+
+# It finds out what repositories are on my server that aren't cloned locally,
+# and shows an appropriate "git clone" line to clone them.
+
+SERVER="thomas.rudolf.org.uk"
+DIR="/home/davide/var/git"
+
+REPOS="$( ssh "$SERVER" "ls -1 $DIR" )"
+
+echo "$REPOS" | while read dotgit
+do
+	git=${dotgit%.git}
+	if [ -d "$git" ] ; then continue ; fi
+	echo "git clone $SERVER:$DIR/$dotgit"
+done
+
+# eof git-clone-new-repos
