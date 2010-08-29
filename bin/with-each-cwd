@@ -13,11 +13,16 @@ fi
 
 shift
 
+rc=0
 for dir in "${dirs[@]}" ; do
 	if pushd "$dir" ; then
-		"$@"
+		if ! "$@" ; then rc=1 ; fi
 		popd >/dev/null
+	else
+		rc=1
 	fi
 done
+
+exit $rc
 
 # eof
