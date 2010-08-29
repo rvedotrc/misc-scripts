@@ -9,13 +9,13 @@ lsmod | tail -n+2 | while read LINE ; do
 	set -f
 	set $LINE
 	MOD=$1
-	echo "$MOD"
+	echo "\"$MOD\""
 	IFS=,
 	for DEP in $4 ; do
-		if echo "$DEP" | fgrep -q '[' ; then
+		if echo "\"$DEP\"" | fgrep -q '[' ; then
 			continue
 		fi
-		echo "$MOD -> $DEP"
+		echo "\"$MOD\" -> \"$DEP\""
 	done
 done
 echo "}"
