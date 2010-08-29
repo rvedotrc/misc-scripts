@@ -45,8 +45,23 @@ encode-mime-header
 encode-quotedprintable
 	See decode-base64 / decode-mime-header / decode-quotedprintable.
 
+find-path-conflicts
+	Scans directories on your $PATH for executables; for each executable
+	name found in more than one such directory, shows the executable name
+	and the locations in which it was found.
+
+git-clone-new-repos
+	TODO
+
 git-push-new-repo
+	TODO
+
 linux26-diskstats-agent
+	TODO
+
+lsmod-graph
+	Runs "lsmod", and outputs a "dot" graph of dependencies between
+	modules.  e.g. "lsmod-graph | dot -Tpng -o lsmod.png"
 
 read-djbdns-ips
 	Given some djbdns (dnscache/tinydns/axfrdns) logs on standard input,
@@ -56,6 +71,11 @@ read-djbdns-ips
 	- shows query type names (aaaa, etc)
 
 read-nginx-timestamps
+	Acts as a filter on the named FILEs, or standard input.  For each
+	line, convert the timestamp (the number at the start of the line) to a
+	human-readable timestamp.  If "-f" if specified, autoflush the output.
+
+	read-nginx-timestamps [-f] [FILE ...]
 
 realpath
 	Perform realpath(3) translations
@@ -69,6 +89,19 @@ realpath
 	If no PATHs are specified, then read PATHs from standard input, one
 	per line, translate each PATH, and show each to standard output, one
 	per line.
+
+resize-logvol
+	Helper script to resize a logical volume (which contains an ext2/ext3
+	filesystem).
+
+	resize-logvol LV SIZE
+
+sorted-terse-listing
+	Somewhat like "find ... -ls", but always processes directory entries
+	in a predictable order, and the output is more machine-readable.  Good
+	for comparing two directory trees.
+
+	sorted-terse-listing [PATH ...]
 
 uniqish
 	uniqish - output only unique lines, more or less
@@ -98,6 +131,12 @@ with-cwd
 	Change directory then run a program.
 
 	with-cwd DIR PROG [ARG ...]
+
+with-each-cwd
+	For each directory listed, change to that directory then run some
+	command.
+
+	with-each-cwd [DIR ...] -- PROG [ARG ...]
 
 xml-escape
 xml-unescape
