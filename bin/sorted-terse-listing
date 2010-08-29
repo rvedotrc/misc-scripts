@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+# vi: set et sw=4 :
+use warnings;
+use strict;
+
+=pod
+
+For each path listed on the command line (or "." if none), do a recursive
+filesystem walk.  Directory entries are processed in lexical order.  Symbolic
+links are not followed.  Mount points ARE crossed, though this may change in
+future.
+
+For each found object, one line is printed to standard output, including
+dev/inode number, mode, uid, gid, size, mtime, path, and (if a symbolic link)
+what the link points to.
+
+Good for comparing two directory trees.
+
+=cut
+
+use File::Find;
+@ARGV = "." if not @ARGV;
+find(
+    {
+        no_chdir => 1,
+        preprocess => sub { sort @_ },
+        wanted => sub {
+            my @s = lstat($_) or return;
+            printf "%s\t%s\t%04o\t%d\t%d\t%d\t%s\t%s\t",
+                @s[0,1],
+                $s[2] & 07777,
+                @s[3,4,5,7,9],
+                or die $!;
+            s/([^\x20-\x5B\x5D-\x7E])/"\\" . sprintf "%03o", ord $1/eg;
+            print $_ or die $!;
+            if (-l and defined(my $r = readlink($_))) {
+                $r =~ s/([^\x20-\x5B\x5D-\x7E])/"\\" . sprintf "%03o", ord $1/eg;
+                print "\t->\t$r" or die $!;
+            }
+            print "\n" or die $!;
+        },
+    },
+    @ARGV,
+);

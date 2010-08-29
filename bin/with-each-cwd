@@ -1,0 +1,23 @@
+#!/bin/bash
+
+declare -a dirs
+while [ $# != 0 -a "$1" != "--" ] ; do
+	dirs=( "${dirs[@]}" "$1" )
+	shift
+done
+
+if [ $# = 0 ] ; then
+	echo "Usage: with-each-cwd DIR ... -- CMD AND ARGS" >&2
+	exit 2
+fi
+
+shift
+
+for dir in "${dirs[@]}" ; do
+	if pushd "$dir" ; then
+		"$@"
+		popd >/dev/null
+	fi
+done
+
+# eof

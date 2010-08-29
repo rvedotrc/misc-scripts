@@ -1,0 +1,96 @@
+#!/bin/bash
+
+set -e
+set -u
+
+if [ $# != 2 ] ; then
+	echo "Usage: resize-logvol LV SIZE" >&2
+	exit 2
+fi
+
+LV="$1"
+TARGET_SIZE="$2"
+
+LV="$( readlink -n -f "$LV" )"
+echo "Using $LV"
+
+SS="$( blockdev --getss "$LV" )"
+
+TARGET_BYTES="$( perl -e '
+	use Math::BigInt;
+	my $k = Math::BigInt->new(1024);
+	my $TARGET_SIZE = shift;
+	my ($n, $suffix) = $TARGET_SIZE =~ /^([0-9.]+)([BKMGT]?)$/i
+		or die "Unrecognised size\n";
+	$n = Math::BigInt->new($n);
+	my %p = (
+		""=> 0,
+		B => 0,
+		K => 1,
+		M => 2,
+		G => 3,
+		T => 4,
+	);
+	my $p = $p{uc $suffix};
+	my $bytes = $n*($k ** $p);
+
+	my $ss = shift;
+	$bytes = $bytes + ($ss-1);
+	$bytes -= ($bytes % $ss);
+	print $bytes;
+' "$TARGET_SIZE" "$SS" )"
+echo "Using ${TARGET_BYTES}B"
+
+unset TARGET_SIZE
+
+get_2fs_size() {
+	local FS_BLOCKCOUNT=$( tune2fs -l "$LV" | grep "^Block count:" | cut -d: -f2 )
+	local FS_BLOCKSIZE=$( tune2fs -l "$LV" | grep "^Block size:" | cut -d: -f2 )
+	local FS_BYTES=$(( $FS_BLOCKCOUNT * $FS_BLOCKSIZE ))
+	echo -n $FS_BYTES
+}
+
+FS_BYTES=$( get_2fs_size )
+echo "FS bytes = $FS_BYTES"
+
+if [ $TARGET_BYTES -lt $FS_BYTES ] ; then
+	echo "Shrinking"
+
+	POINT="$(
+		env LV="$LV" perl -a -lne '
+			print $F[1] if $F[0] eq $ENV{LV};
+		' /proc/mounts
+	)"
+
+	if [ "$POINT" ] ; then
+		echo Is mounted on $POINT
+		umount "$LV"
+	fi
+
+	/sbin/fsck.ext2 -f -p -C 0 "$LV"
+	/sbin/resize2fs -p "$LV" "$(( $TARGET_BYTES / 1024 ))K"
+
+	NEW_FS_BYTES=$( get_2fs_size )
+
+	# Add "-y" (?) here
+	lvresize -v --size="$(( $NEW_FS_BYTES / 1024 ))K" "$LV" 
+
+	if [ "$POINT" ] ; then
+		echo Remounting on $POINT
+		mount "$LV" "$POINT"
+	fi
+
+elif [ $TARGET_BYTES -gt $FS_BYTES ] ; then
+	echo "Growing"
+
+	lvresize -v --size="$(( $TARGET_BYTES / 1024 ))K" "$LV"
+	/sbin/resize2fs -p "$LV" "$(( $TARGET_BYTES / 1024 ))K"
+
+else
+	echo "No change in size - nothing to do"
+	exit 0
+fi
+
+
+
+# eof resize-logvol
