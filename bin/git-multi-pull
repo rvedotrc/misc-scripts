@@ -1,0 +1,4 @@
+#!/bin/bash
+if [ $# = 0 ] ; then set . ; fi
+# FIXME shell quoting :-/
+exec with-each-cwd `find . -name .git | dirname-filter` -- git pull
