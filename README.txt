@@ -53,6 +53,12 @@ find-path-conflicts
 git-clone-new-repos
 	TODO
 
+git-multi-pull
+	Do a "git pull" on all git repositories found under DIRs (or "." by
+	default).
+
+	git-multi-pull [DIR ...]
+
 git-push-new-repo
 	TODO
 
