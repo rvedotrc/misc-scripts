@@ -103,6 +103,11 @@ sorted-terse-listing
 
 	sorted-terse-listing [PATH ...]
 
+svstat-tidy
+	Runs "svstat" (part of the daemontools suite), passing through
+	whatever arguments were given to svstat-tidy, and reformats the output
+	into a fixed-width style.
+
 uniqish
 	uniqish - output only unique lines, more or less
 

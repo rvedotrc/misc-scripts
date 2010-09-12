@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+open(my $fh, "-|", "svstat", @ARGV)
+    or die "$0: $!\n";
+
+print <<EOF;
+State, up or down
+| Normal state, up or down (blank if == state)
+|/ Paused, blank if not
+||/ Want state, up or down (blank if == state)
+|||/     pid     seconds dir
+++++ ======= =========== ===
+EOF
+
+while (<$fh>) {
+    my $l = $_;
+    chomp $l;
+
+    # FIXME: doesn't handle args that contain ":"
+    $l =~ s/^(.*?): // or next;
+    my $dir = $1;
+
+    if ($l =~ s/^(?:(up) \(pid (\d+)\)|(down)) //) {
+        my $up_or_down = $1 || $3;
+        my $pid = $2;
+
+        $l =~ s/^(\d+) seconds// or next;
+        my $sec = $1;
+
+        my %extra;
+        while ($l =~ s/^, ((normally|want) (up|down)|paused)//) {
+            $extra{$1} = 1;
+        }
+
+        $l eq "" or next;
+
+        $_ = sprintf "%s%s%s%s %7s %11d %s\n",
+            substr($up_or_down, 0, 1),
+            $extra{"normally up"} ? "U" : $extra{"normally down"} ? "D" : " ",
+            $extra{"paused"} ? "P" : " ",
+            $extra{"want up"} ? "U" : $extra{"want down"} ? "D" : " ",
+            $pid || "",
+            $sec,
+            $dir;
+
+    } else {
+        next;
+    }
+} continue {
+    print;
+}
+
+# eof svstat-tidy
