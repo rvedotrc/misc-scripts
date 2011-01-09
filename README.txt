@@ -62,6 +62,10 @@ git-multi-pull
 git-push-new-repo
 	TODO
 
+git-push-to-empty-repo
+	Given a local git repository with no "origin", and an empty remote
+	bare repository, set up the remote as the origin of the local.
+
 linux26-diskstats-agent
 	TODO
 

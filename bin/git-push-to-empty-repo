@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [ $# != 1 ] ; then
+	echo "Usage: git-push-to-empty-repo URI" >&2
+	echo "" >&2
+	echo ". should already be a valid git repository" >&2
+	exit 2
+fi
+
+set -e -x -u
+
+URI="$1"
+shift
+
+# Check there's a commit
+git-rev-parse HEAD
+
+# Check there's not already an origin
+if git config --get remote.origin.url ; then exit 1 ; fi
+if git config --get branch.master.remote ; then exit 1 ; fi
+if git config --get branch.master.merge ; then exit 1 ; fi
+
+git remote add origin "$URI"
+git config branch.master.remote origin
+git config branch.master.merge refs/heads/master
+
+git push origin master
+
+# eof
