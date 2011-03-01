@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+=pod
+
+Usage: ruler [COLUMNS]
+
+Show a ruler of the specified width; defaults to the width of the terminal if
+possible; otherwise defaults to 80.
+
+Markers are added every 5 and 10 characters; for example, "ruler 23" prints
+
+  ...._...10...._...20...
+
+The underscores are at positions 5 and 15, and the final zeroes of the numbers
+are at positions 10 and 20.
+
+=cut
+
+my $w = $ARGV[0];
+$w ||= eval {
+	require Term::ReadKey;
+	my ($wchar, $hchar, $wpixels, $hpixels) = Term::ReadKey::GetTerminalSize();
+	$wchar;
+} if -t STDOUT;
+$w ||= 0;
+
+$w = 0+$w;
+$w ||= 80;
+
+my $n = 0;
+while ($w >= 10) {
+	$n += 10;
+	$w -= 10;
+	my $t = sprintf "%10s", $n;
+	$t =~ tr/ /./;
+	substr($t, 4, 1) =~ tr/./_/;
+	print $t;
+}
+
+my $t = "." x $w;
+substr($t, 4, 1) =~ tr/./_/ if $w > 4;
+print $t;
+print "\n";
+
+# eof ruler
