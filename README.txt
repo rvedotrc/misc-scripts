@@ -31,6 +31,9 @@ countpct
 	showing the percentage, count, and the line itself.  The output is
 	unordered.
 
+csort
+	Exactly like "sort", but forces the locale to "C".
+
 decode-base64, encode-base64
 decode-mime-header, encode-mime-header
 decode-quotedprintable, encode-quotedprintable
@@ -101,6 +104,10 @@ resize-logvol
 	filesystem).
 
 	resize-logvol LV SIZE
+
+ruler
+	Outputs a ruler (default: width of terminal), to help with counting
+	characters.
 
 sorted-terse-listing
 	Somewhat like "find ... -ls", but always processes directory entries

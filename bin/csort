@@ -1,0 +1,3 @@
+#!/bin/sh
+# "sort", but with the C locale.
+exec env LANG=C sort "$@"
