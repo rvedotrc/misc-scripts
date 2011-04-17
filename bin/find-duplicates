@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+my %files;
+my %by_size;
+
+my $s = sub {
+	my $n = $File::Find::name;
+
+	my @s = stat($n) or return;
+	my $file = {
+		path => $n,
+		stat => \@s,
+	};
+
+	$files{$n} = $file;
+	push @{ $by_size{ -s _ } }, $file;
+};
+
+@ARGV = "." if not @ARGV;
+use File::Find 'find';
+find({ wanted => $s, no_chdir => 1, follow => 1 }, @ARGV);
+
+for my $set (values %by_size) {
+	@$set > 1 or next;
+
+	require Digest::MD5;
+	my %by_md5;
+
+	for my $file (@$set) {
+		open(my $fh, "<", $file->{path}) or die $!;
+		my $ctx = Digest::MD5->new;
+		$ctx->addfile($fh);
+		$file->{md5} = $ctx->hexdigest;
+		push @{ $by_md5{ $ctx->hexdigest } }, $file;
+	}
+
+	for my $set2 (values %by_md5) {
+		@$set2 > 1 or next;
+		print $_->{path}, "\n" for sort @$set2;
+		print "\n";
+	}
+}
+

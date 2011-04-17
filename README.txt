@@ -48,6 +48,12 @@ encode-mime-header
 encode-quotedprintable
 	See decode-base64 / decode-mime-header / decode-quotedprintable.
 
+find-duplicates
+	Simple duplicate file finder.  Just shows the names of files in
+	duplicate-sets; doesn't (say) delete them.
+
+	find-duplicates [FILE-OR-DIR ...]
+
 find-path-conflicts
 	Scans directories on your $PATH for executables; for each executable
 	name found in more than one such directory, shows the executable name
