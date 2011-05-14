@@ -21,6 +21,9 @@ basename-filter, dirname-filter
 	For each line on standard input, perform "basename" or "dirname" and
 	echo to standard output.
 
+cat-range
+	Output / concatenate byte-ranges of files
+
 countpct
 	Counts patterns on standard input (or from FILEs), showing counts of
 	each, and as a percentage of the total.

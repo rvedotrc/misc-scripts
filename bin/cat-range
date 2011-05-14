@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+# Usage: cat-range SPEC ...
+#
+# Where each SPEC is: FILE:[START]:[END]
+#
+# START and END are 0-based byte offsets.  START defaults to 0; END defaults to
+# the size of FILE.
+#
+# All the FILEs have to regular files.
+
+use Math::BigInt;
+
+for my $arg (@ARGV) {
+    my ($file, $start, $end) = $arg =~ m{^(.*):(\d*):(\d*)$}
+        or die;
+    $start ||= 0;
+    $end ||= -s($file);
+    cat_section($file, $start, $end-$start);
+}
+
+sub cat_section {
+    my ($file, $start, $count) = @_;
+
+    $start = Math::BigInt->new($start);
+    $count = Math::BigInt->new($count);
+
+    return if $count < 1;
+
+    # I'm guessing that "dd" is more efficient than perl at copying lots of data
+    my $bs = 4096;
+
+    # So:
+
+    # Do a slow copy of $start to $next_kb_boundary
+    my $next_kb_boundary = ($start + $bs - 1) / $bs * $bs;
+
+    if ($next_kb_boundary > $start) {
+        my $n = $next_kb_boundary - $start;
+        print STDERR "$file Slow copy start=$start count=$n\n";
+        slow_cat($file, $start, $n);
+        $start += $n;
+        $count -= $n;
+    }
+
+    # Do a fast copy of as many blocks as we can
+    my $blocks = $count / $bs;
+    if ($blocks > 0) {
+        my $skip = $start / $bs;
+        $skip * $bs == $start or die;
+        print STDERR "$file Fast copy start=$start bs=$bs count=$blocks\n";
+        system "dd", "if=$file", "bs=$bs", "skip=$skip", "count=$blocks";
+        $? == 0 or die;
+        $start += $blocks * $bs;
+        $count -= $blocks * $bs;
+    }
+
+    # Do a slow copy of the rest
+    if ($count) {
+        print STDERR "$file Slow copy start=$start count=$count\n";
+        slow_cat($file, $start, $count);
+    }
+}
+
+sub slow_cat {
+    my ($file, $start, $count) = @_;
+    open(my $fh, "<", $file) or die $!;
+    seek $fh, $start, 0 or die $!;
+    my $buff;
+    (read $fh, $buff, $count) == $count or die "bad read";
+    print $buff or die $!;
+    close $fh;
+}
+
+# eof
