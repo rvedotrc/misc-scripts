@@ -1,2 +1,3 @@
 #!/bin/sh
+# uri-unescape standard input to standard output.
 exec perl -MURI::Escape=uri_unescape -pe '$_=uri_unescape($_)'

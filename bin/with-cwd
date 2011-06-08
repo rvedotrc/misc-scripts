@@ -1,4 +1,9 @@
 #!/bin/sh
+
+# Usage: with-cwd DIR COMMAND [ARGS ...]
+#
+# Change to directory DIR, then run COMMAND (with ARGS as arguments).
+
 set -e
 cd "$1" ; shift
 exec "$@"

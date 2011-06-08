@@ -1,5 +1,22 @@
 #!/usr/bin/perl -lp
 # vi: set ts=4 sw=4 :
 
+=pod
+
+Usage: basename-filter [FILE ...]
+
+Read lines from FILEs, or standard input.  Apply "basename" processing to each
+one, then copy to standard output.
+
+For example:
+
+  echo /usr/local/bin | basename-filter
+
+outputs "bin".
+
+See also "dirname-filter".
+
+=cut
+
 use File::Basename qw( basename );
 $_ = basename($_);

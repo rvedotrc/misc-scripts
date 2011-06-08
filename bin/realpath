@@ -4,6 +4,17 @@
 use warnings;
 use strict;
 
+=pod
+
+Usage: realpath PATH
+       realpath
+
+Perform realpath(3) translation.  In the first form, translate PATH; in the
+second, lines are read from standard input, and the translation performed on
+each line.  Results are sent to standard output.
+
+=cut
+
 use Cwd 'realpath';
 
 my $errors;

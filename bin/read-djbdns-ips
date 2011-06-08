@@ -4,6 +4,18 @@
 use warnings;
 use strict;
 
+=pod
+
+Usage: read-djbdns-ips [FILE ...]
+
+Read "djbdns" log lines from FILEs (or standard input); whenever an
+8-character hexadecimal string representing an IPv4 address is seen, replace
+it with its dotted-quad form.  Output is line-buffered.
+
+e.g. "tail -F /etc/dnscache/log/main/current | read-djbdns-ips"
+
+=cut
+
 sub ip { join ".", unpack "C*", pack "H*", $_[0] }
 
 sub many_ips { join " ", map { ip($_) } split ' ', $_[0] }
@@ -47,7 +59,7 @@ while (<>) {
 	print;
 }
 
-=pod
+__END__
 
 dnscache log lines, from reading log.c:
 

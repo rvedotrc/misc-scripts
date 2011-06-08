@@ -1,3 +1,3 @@
 #!/bin/sh
-#exec perl -MMIME::Base64=encode_base64 -we'local $/; print encode_base64(<>)'
+# Base64-encode standard input to standard output.
 exec openssl enc -e -base64

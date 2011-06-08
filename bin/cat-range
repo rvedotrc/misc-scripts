@@ -3,14 +3,16 @@
 use warnings;
 use strict;
 
-# Usage: cat-range SPEC ...
+# Usage: cat-range [SPEC ...]
 #
-# Where each SPEC is: FILE:[START]:[END]
+# Copy ranges of files to standard output
+#
+# Each SPEC is: FILE:[START]:[END]
 #
 # START and END are 0-based byte offsets.  START defaults to 0; END defaults to
 # the size of FILE.
 #
-# All the FILEs have to regular files.
+# All the FILEs have to be regular files.
 
 use Math::BigInt;
 

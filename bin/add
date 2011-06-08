@@ -4,6 +4,28 @@
 use warnings;
 use strict;
 
+=pod
+
+Usage: add [-a] -e [NUM ...]
+       add [-a] [FILE ...]
+
+Adds numbers and outputs the total.  If "-a" is specified (and at least one
+number was read), also output the mean average, with two decimal places.
+
+In the first form, the numbers to add are given as command line arguments.  In
+the second form, the given FILEs (or standard input) are read, and each line
+is interpreted as a number.  Non-numeric arguments / lines are ignored.
+
+Example:
+
+  "add -a -e 1 2 4 frog 5" 
+
+produces the output
+
+  12      3.00
+
+=cut
+
 use Math::BigFloat;
 my $t = Math::BigFloat->new(0);
 my $n = 0;

@@ -1,2 +1,3 @@
 #!/bin/sh
+# Quoted-Printable-decode standard input to standard output.
 exec perl -MMIME::QuotedPrint=decode_qp -we'local $/; print decode_qp(<>)'

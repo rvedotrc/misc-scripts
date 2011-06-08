@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Usage: whichglob PATTERN
+#
+# Searches your PATH for things matching PATTERN.  For example,
+# "whichglob '*wm'" might be used to find window managers (whose names
+# traditionally end with "wm").
+
 GLOB="$1"
 
 IFS=:

@@ -4,6 +4,30 @@
 use warnings;
 use strict;
 
+=pod
+
+Usage: countpct [FILE ...]
+
+Counts text patterns (in fact, whole lines).
+
+Read lines from the given FILEs, or standard input.  Count the number times
+each pattern (whole line) is seen, keeping totals; once all lines have been
+read, then for each pattern seen, output how many times it was seen, how much
+this is as a percentage of the total, and the pattern itself.  The output is
+in no particular order.
+
+For example:
+
+  ( echo cat ; echo dog ; echo cat ; echo fish ) | countpct
+
+might output:
+
+  25.00%           1 fish
+  50.00%           2 cat
+  25.00%           1 dog
+
+=cut
+
 my %n;
 my $lines = 0;
 while (<>)

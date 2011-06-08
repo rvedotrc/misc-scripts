@@ -4,6 +4,18 @@
 use warnings;
 use strict;
 
+=pod
+
+Usage: read-nginx-timestamps [-f] [FILE ...]
+
+Read lines from FILEs (or standard input); for each line, if it starts with a
+sequence of digits, assume that it's a timestamp (seconds since epoch), and
+replace the digits by the timestamp in "yyyy-mm-ddThh:mm:ssZ" form.
+
+If "-f" is specified, the output is line-buffered.
+
+=cut
+
 my $i = '';
 my $o;
 
