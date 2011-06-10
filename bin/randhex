@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+# vi: set ts=4 sw=4 :
+
+use warnings;
+use strict;
+
+my $bytes = shift() || 4;
+my $sep = shift() || '';
+
+open(my $fh, "<", "/dev/random");
+read($fh, my $buff, $bytes);
+my $text = unpack "h*", $buff;
+$text =~ s/(....)(?!$)/$1$sep/g;
+print "$text\n";
+
+# eof randhex

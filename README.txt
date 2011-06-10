@@ -78,12 +78,24 @@ git-push-to-empty-repo
 	Given a local git repository with no "origin", and an empty remote
 	bare repository, set up the remote as the origin of the local.
 
+hgrep
+	Colour-highlighting grep.  Unlike "grep --color", uses background
+	colours instead of foreground, so I find it stands out better.
+
+	tail ..... | hgrep [-a] -p PATTERN [-p PATTERN -p PATTERN ...]
+
 linux26-diskstats-agent
 	TODO
 
 lsmod-graph
 	Runs "lsmod", and outputs a "dot" graph of dependencies between
 	modules.  e.g. "lsmod-graph | dot -Tpng -o lsmod.png"
+
+randhex
+	Pulls "N" bytes from /dev/random and shows them as lower case
+	hexadecimal.
+
+	randhex [N [separator]]
 
 read-djbdns-ips
 	Given some djbdns (dnscache/tinydns/axfrdns) logs on standard input,
