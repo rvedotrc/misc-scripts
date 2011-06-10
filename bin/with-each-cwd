@@ -15,7 +15,8 @@ shift
 
 rc=0
 for dir in "${dirs[@]}" ; do
-	if pushd "$dir" ; then
+	if pushd "$dir" >/dev/null ; then
+		printf '%s\n' "$dir"
 		if ! "$@" ; then rc=1 ; fi
 		popd >/dev/null
 	else
