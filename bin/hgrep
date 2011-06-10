@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w
+# vi: set ts=4 sw=4 :
+
+use strict;
+$| = 1;
+
+use Getopt::Long;
+use Term::ANSIColor;
+
+my (@patterns, $fShowAll, $fHelp, $fVersion);
+
+GetOptions(
+	"pattern|patt|p=s"	=> \@patterns,
+	"all|a"				=> \$fShowAll,
+	"help"				=> \$fHelp,
+	"version"			=> \$fVersion,
+);
+
+sub version { (split ' ', '$Revision: 1.1 $')[1] || "?" }
+
+die "hgrep version " . version() . "\n"
+	if $fVersion;
+
+die <<EOF if $fHelp;
+Usage: hgrep [-a] -p pattern [-p pattern ...] [file...]
+
+hgrep - Highlighting grep by Rachel Evans
+	version ${\ version() }
+
+Options:
+
+    --all, -a
+        Show all lines, not just ones where at least one pattern matched
+
+    --pattern P, -p P
+        Add a pattern (this option may be specified multiple times)
+
+    --help, -h
+        Show this help
+
+    --version
+        Show version information
+
+Description:
+
+The text specified by [file...] is read in.  Each line is tested for each of
+the patterns.  If none of the patterns matched and --all was not specified,
+the line is discarded.  Otherwise, each of the occurences of each of the
+patterns is highlighted, and the result sent to standard output.
+
+The highlights used are those for a colour terminal, optimised for a
+white-on-black display.  A number of highlight types are available (specified
+within this script).  Each pattern argument is mapped to one of those
+highlight types, recycling the highlights when the end of the list is reached.
+Currently there are four highlights, so if up to four patterns are specified,
+each will receive a different highlight; if five are used, two will share a
+highlight, and the other three will have their own, etc.
+
+Example:
+
+    Tail an Apache access log looking for various things:
+        tail -f error.log | hgrep -a -p " 500 " -p "POST" -p " 404 "
+
+EOF
+
+my @highlights = (
+	'white on_red',
+	'white on_magenta',
+	'white on_cyan',
+	'white on_yellow',
+);
+
+my $iHighlight = 0;
+
+while (<ARGV>)
+{
+	my $fMatched = 0;
+
+	for my $i (0..$#patterns)
+	{
+		s/($patterns[$i])/highlight($1, $i)/ge
+			and $fMatched = 1;
+	}
+
+	next unless $fMatched or $fShowAll;
+
+	print;
+}
+
+sub highlight
+{
+	my ($sText, $iHighlight) = @_;
+	return "" if $sText eq "";
+
+	colored($sText, $highlights[ $iHighlight % @highlights ]);
+}
+
+# eof hgrep
