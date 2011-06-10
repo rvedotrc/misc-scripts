@@ -21,6 +21,9 @@ basename-filter, dirname-filter
 	For each line on standard input, perform "basename" or "dirname" and
 	echo to standard output.
 
+cat-range
+	Output / concatenate byte-ranges of files
+
 countpct
 	Counts patterns on standard input (or from FILEs), showing counts of
 	each, and as a percentage of the total.
@@ -48,6 +51,12 @@ encode-mime-header
 encode-quotedprintable
 	See decode-base64 / decode-mime-header / decode-quotedprintable.
 
+find-duplicates
+	Simple duplicate file finder.  Just shows the names of files in
+	duplicate-sets; doesn't (say) delete them.
+
+	find-duplicates [FILE-OR-DIR ...]
+
 find-path-conflicts
 	Scans directories on your $PATH for executables; for each executable
 	name found in more than one such directory, shows the executable name
@@ -64,6 +73,10 @@ git-multi-pull
 
 git-push-new-repo
 	TODO
+
+git-push-to-empty-repo
+	Given a local git repository with no "origin", and an empty remote
+	bare repository, set up the remote as the origin of the local.
 
 hgrep
 	Colour-highlighting grep.  Unlike "grep --color", uses background
