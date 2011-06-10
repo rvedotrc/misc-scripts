@@ -1,9 +1,22 @@
 #!/bin/sh
 
-# Usage: with-cwd DIR COMMAND [ARGS ...]
-#
-# Change to directory DIR, then run COMMAND (with ARGS as arguments).
-
 set -e
-cd "$1" ; shift
+
+usage() {
+	cat <<EOF
+
+Usage: with-cwd DIR COMMAND [ARGS ...]
+
+Change to directory DIR, then run COMMAND (with ARGS as arguments).
+
+EOF
+}
+
+if [ "$1" = --help ] ; then usage ; exit ; fi
+if [ $# -lt 2 ] ; then usage >&2 ; exit 2 ; fi
+
+DIR="$1" ; shift
+case "$DIR" in -*) DIR="./$DIR" ;; esac
+cd "$DIR"
+
 exec "$@"
