@@ -14,9 +14,16 @@ For example:
 
 outputs "bin".
 
+If --zero is specified, then the input and output separators are both a 0-byte,
+instead of a newline.
+
 See also "dirname-filter".
 
 =cut
 
 use File::Basename qw( basename );
+use Getopt::Long;
+BEGIN {
+	GetOptions('zero|z|0' => sub { $/ = $\ = chr(0) });
+}
 $_ = basename($_);

@@ -3,7 +3,7 @@
 
 =pod
 
-Usage: dirname-filter [FILE ...]
+Usage: dirname-filter [--zero|-z|-0] [FILE ...]
 
 Read lines from FILEs, or standard input.  Apply "dirname" processing to each
 one, then copy to standard output.
@@ -14,9 +14,16 @@ For example:
 
 outputs "/usr/local".
 
+If --zero is specified, then the input and output separators are both a 0-byte,
+instead of a newline.
+
 See also "basename-filter".
 
 =cut
 
 use File::Basename qw( dirname );
+use Getopt::Long;
+BEGIN {
+	GetOptions('zero|z|0' => sub { $/ = $\ = chr(0) });
+}
 $_ = dirname($_);
