@@ -21,6 +21,9 @@ for my $dir (@dirs) {
 	find(
 		sub {
 			return if $_ eq ".";
+			# Pretty sure that File::Find promised to stat() for us,
+			# but it doesn't always seem to be true...
+			stat $File::Find::name or return;
 			$File::Find::prune = 1, return
 				unless -f(_) and -x(_);
 			push @{ $whereis{$_} }, $dir;
