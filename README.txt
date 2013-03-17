@@ -75,6 +75,14 @@ find-path-conflicts
 	name found in more than one such directory, shows the executable name
 	and the locations in which it was found.
 
+find-poms
+	Scan the selected DIRs (or "." if none specified) looking for those
+	containing "pom.xml".  Do not follow symlinks.  Prune the scan if a
+	directory contains a pom.xml but its subdirectory does not. If
+	-t/--top is specified, prune as soon as a pom.xml is found.
+
+	find-poms [-t, --top] [DIR ...]
+
 git-clone-new-repos
 	TODO
 

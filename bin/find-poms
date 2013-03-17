@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require "optparse"
+opts = ARGV.getopts("t", "top")
+
+# find-poms [-t, --top] [DIR ...]
+#
+# Scan the selected DIRs (or "." if none specified) looking for those
+# containing "pom.xml".  Do not follow symlinks.  Prune the scan if a
+# directory contains a pom.xml but its subdirectory does not. If -t/--top is
+# specified, prune as soon as a pom.xml is found.
+
+dirs = ARGV
+dirs.empty? and dirs.push "."
+
+queue = dirs.map { |dir| [ dir, false ] }
+while !queue.empty? do
+    (dir, stop_if_no_pom) = queue.shift
+
+    contains_pom = File.exist? "#{dir}/pom.xml"
+    puts dir if contains_pom
+
+    next if contains_pom and (opts["t"] or opts["top"])
+
+    next if !contains_pom and stop_if_no_pom
+
+    Dir.glob("#{dir}/*").each do |d|
+        unless File.symlink? d
+            queue.unshift [ d, contains_pom ]
+        end
+    end
+end
+
