@@ -51,6 +51,12 @@ encode-mime-header
 encode-quotedprintable
 	See decode-base64 / decode-mime-header / decode-quotedprintable.
 
+find-cdpath-conflicts
+	Scans directories on your $CDPATH for (immediate child)
+	subdirectories; for each subdirectory name found in more than one such
+	directory, shows the subdirectory name and the locations in which it
+	was found.
+
 find-duplicates
 	Simple duplicate file finder.  Just shows the names of files in
 	duplicate-sets; doesn't (say) delete them.

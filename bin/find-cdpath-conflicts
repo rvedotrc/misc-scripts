@@ -4,18 +4,18 @@
 use warnings;
 use strict;
 
-# Scans directories on your $PATH for executables; for each executable name
-# found in more than one such directory, shows the executable name and the
-# locations in which it was found.
+# Scans directories on your $CDPATH for (immediate child) subdirectories; for
+# each subdirectory name found in more than one such directory, shows the
+# subdirectory name and the locations in which it was found.
 
-my @dirs = split /:/, $ENV{PATH};
+my @dirs = split /:/, $ENV{CDPATH};
 my %whereis;
 
 my %done_dir;
 
 for my $dir (@dirs) {
 	next if $done_dir{$dir}++;
-	-d($dir) or warn("Warning: $dir (on your PATH) is not a directory\n"), next;
+	-d($dir) or warn("Warning: $dir (on your CDPATH) is not a directory\n"), next;
 
 	use File::Find qw( find );
 	find(
@@ -24,9 +24,9 @@ for my $dir (@dirs) {
 			# Pretty sure that File::Find promised to stat() for us,
 			# but it doesn't always seem to be true...
 			stat $File::Find::name or return;
-			$File::Find::prune = 1, return
-				unless -f(_) and -x(_);
-			push @{ $whereis{$_} }, $dir;
+			push @{ $whereis{$_} }, $dir
+				if -d(_);
+			$File::Find::prune = 1;
 		},
 		$dir,
 	);
