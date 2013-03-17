@@ -63,6 +63,13 @@ find-duplicates
 
 	find-duplicates [FILE-OR-DIR ...]
 
+find-git-repos
+	Scans the specified DIRs (or "." by default) looking for (non-bare)
+	git repositories (i.e. those containing a ".git" subdirectory).  Print
+	the name of each one found to standard output, one per line.
+
+	find-git-repos [DIR ...]
+
 find-path-conflicts
 	Scans directories on your $PATH for executables; for each executable
 	name found in more than one such directory, shows the executable name

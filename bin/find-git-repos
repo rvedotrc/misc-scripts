@@ -1,0 +1,3 @@
+#!/bin/bash
+if [ $# = 0 ] ; then set . ; fi
+find "$@" -exec [ -d "{}/.git" ] ';' -a -print -a -prune
