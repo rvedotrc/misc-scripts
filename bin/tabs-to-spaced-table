@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+lines = $stdin.readlines.map { |l| l.chomp }.map { |l| l.split /\t/ }
+
+widths = []
+lines.each do |l|
+  (0..(l.size-1)).each do |index|
+    this_with = l[index].length
+    widths[index] = this_with if widths[index].nil? or widths[index] < this_with
+  end
+end
+
+format = widths.map { |w| "%-#{w}s" }.join " "
+format += "\n"
+
+lines.each { |l|
+  while l.size < widths.size do
+    l.push ""
+  end
+  puts format % l
+}

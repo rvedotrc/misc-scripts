@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+lines = $stdin.readlines.map { |l| l.chomp }.map { |l| l.split /\t/ }
+
+lines.each do |l|
+  puts "| " + l.join(" | ") + " |\n"
+end
+
