@@ -6,7 +6,7 @@ use strict;
 
 =pod
 
-Usage: countpct [FILE ...]
+Usage: countpct [-w|--weighted] [FILE ...]
 
 Counts text patterns (in fact, whole lines).
 
@@ -26,14 +26,40 @@ might output:
   50.00%           2 cat
   25.00%           1 dog
 
+If -w/--weighted is specified, then each line MUST start with a number
+(specifically: some optional whitespace, then a number, then some mandatory
+whitespace); this is removed.  The line then counts with a weight of the given
+number, rather than 1.  (Zero and negative weights are allowed, but an error
+may occur if there /is/ some input, but the total weight of all input is zero).
+
+For example:
+
+  ( echo 7 cat ; echo 3 dog ; echo 2 cat ; echo 12 fish ) | countpct --weighted
+
+might output:
+
+  50.00%          12 fish
+  37.50%           9 cat
+  12.50%           3 dog
+
 =cut
+
+my $weighted;
+use Getopt::Long;
+GetOptions(
+		"w|weighted" => \$weighted,
+) or exit 2;
 
 my %n;
 my $lines = 0;
 while (<>)
 {
-	++$n{$_};
-	++$lines;
+	my $weight = 1;
+	if ($weighted) {
+		($weight, $_) = /^\s*(\S*\d\S*)\s+(.*\n)/ or die "countpct: Line did not start with a number: $_\n";
+	}
+	$n{$_} += $weight;
+	$lines += $weight;
 }
 
 while (my ($line, $count) = each %n)
