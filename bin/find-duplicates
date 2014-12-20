@@ -10,7 +10,8 @@ my %by_size;
 my $s = sub {
 	my $n = $File::Find::name;
 
-	my @s = stat($n) or return;
+	my @s = lstat($n) or return;
+	-f(_) or return;
 	my $file = {
 		path => $n,
 		stat => \@s,
@@ -22,7 +23,7 @@ my $s = sub {
 
 @ARGV = "." if not @ARGV;
 use File::Find 'find';
-find({ wanted => $s, no_chdir => 1, follow => 1 }, @ARGV);
+find({ wanted => $s, no_chdir => 1 }, @ARGV);
 
 for my $set (values %by_size) {
 	@$set > 1 or next;
