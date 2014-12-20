@@ -29,19 +29,21 @@ for my $set (values %by_size) {
 	@$set > 1 or next;
 
 	require Digest::MD5;
-	my %by_md5;
+	my %by_digest;
 
 	for my $file (@$set) {
 		open(my $fh, "<", $file->{path}) or die $!;
 		my $ctx = Digest::MD5->new;
 		$ctx->addfile($fh);
-		$file->{md5} = $ctx->hexdigest;
-		push @{ $by_md5{ $ctx->hexdigest } }, $file;
+		my $hexdigest = $ctx->hexdigest;
+
+		$file->{hexdigest} = $hexdigest;
+		push @{ $by_digest{ $hexdigest } }, $file;
 	}
 
-	for my $set2 (values %by_md5) {
+	for my $set2 (values %by_digest) {
 		@$set2 > 1 or next;
-		print $_->{path}, "\n" for sort @$set2;
+		print $_, "\n" for sort map { $_->{path} } @$set2;
 		print "\n";
 	}
 }
