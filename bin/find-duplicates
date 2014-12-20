@@ -32,11 +32,7 @@ for my $set (values %by_size) {
 	my %by_digest;
 
 	for my $file (@$set) {
-		open(my $fh, "<", $file->{path}) or die $!;
-		my $ctx = Digest::MD5->new;
-		$ctx->addfile($fh);
-		my $hexdigest = $ctx->hexdigest;
-
+		my $hexdigest = get_digest($file->{path});
 		$file->{hexdigest} = $hexdigest;
 		push @{ $by_digest{ $hexdigest } }, $file;
 	}
@@ -46,5 +42,14 @@ for my $set (values %by_size) {
 		print $_, "\n" for sort map { $_->{path} } @$set2;
 		print "\n";
 	}
+}
+
+sub get_digest {
+	my $path = shift;
+
+	open(my $fh, "<", $path) or die $!;
+	my $ctx = Digest::MD5->new;
+	$ctx->addfile($fh);
+	$ctx->hexdigest;
 }
 
