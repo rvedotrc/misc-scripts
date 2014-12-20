@@ -4,6 +4,16 @@
 use warnings;
 use strict;
 
+use Getopt::Long;
+my $delete;
+my $dry_run;
+my $verbose;
+GetOptions(
+	'delete|D' => \$delete,
+	'dry-run|n' => \$dry_run,
+	'verbose|v' => \$verbose,
+);
+
 my %files;
 my %by_size;
 
@@ -23,7 +33,7 @@ my $s = sub {
 
 @ARGV = "." if not @ARGV;
 use File::Find 'find';
-find({ wanted => $s, no_chdir => 1 }, @ARGV);
+find({ wanted => $s, preprocess => sub { sort @_ }, no_chdir => 1 }, @ARGV);
 
 for my $set (values %by_size) {
 	@$set > 1 or next;
@@ -39,8 +49,19 @@ for my $set (values %by_size) {
 
 	for my $set2 (values %by_digest) {
 		@$set2 > 1 or next;
-		print $_, "\n" for sort map { $_->{path} } @$set2;
-		print "\n";
+		if ($delete) {
+			my ($to_keep, @to_delete) = @$set2;
+
+			print "KEEP $to_keep->{path}\n" if $verbose;
+
+			for my $to_delete (@to_delete) {
+				print "DELETE $to_delete->{path}\n" if $verbose;
+				unlink $to_delete->{path} unless $dry_run;
+			}
+		} else {
+			print $_, "\n" for sort map { $_->{path} } @$set2;
+			print "\n";
+		}
 	}
 }
 
