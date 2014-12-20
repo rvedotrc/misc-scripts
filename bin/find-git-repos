@@ -1,3 +1,38 @@
-#!/bin/bash
-if [ $# = 0 ] ; then set . ; fi
-find "$@" -exec [ -d "{}/.git" ] ';' -a -print -a -prune
+#!/usr/bin/perl
+# vi: set et sw=4 :
+
+use warnings;
+use strict;
+
+if (@ARGV == 0) {
+    @ARGV = ".";
+}
+
+my @queue = @ARGV;
+$| = 1;
+
+while (@queue) {
+    my $dir = shift @queue;
+    lstat($dir) or next;
+    -d(_) or next;
+
+    opendir(my $dh, $dir) or next;
+    my @entries = grep !/\A\.\.?\z/, sort readdir $dh;
+    closedir $dh;
+
+    my %entries = map { $_,1 } @entries;
+
+    if ($entries{".git"} and -d "$dir/.git") {
+        print "$dir\n";
+        next;
+    }
+
+    unshift @queue, map { "$dir/$_" } @entries;
+}
+
+# Older, less efficient version using find(1):
+# #!/bin/bash
+# if [ $# = 0 ] ; then set . ; fi
+# find "$@" -exec [ -d "{}/.git" ] ';' -a -print -a -prune
+
+# eof find-git-repositories
