@@ -7,7 +7,7 @@ add
 	add [-a] -e [NUM ...]
 	add [-a] [FILE ...]
 
-	With -e, the numbers to add area specified on the command line.
+	With -e, the numbers to add are specified on the command line.
 	Without -e, the nubers are read from the given FILEs (or standard
 	input if no files are specified, or if FILE is "-"), one per line.
 
