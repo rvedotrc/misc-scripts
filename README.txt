@@ -105,6 +105,10 @@ hgrep
 
 	tail ..... | hgrep [-a] -p PATTERN [-p PATTERN -p PATTERN ...]
 
+isodate
+    Show the current time in UTC time zone, ISO8601 format, e.g.:
+    2024-06-06T18:58:59Z
+
 linux26-diskstats-agent
 	TODO
 
